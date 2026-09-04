@@ -76,6 +76,9 @@ export default class Cookie {
       <div class="btn copy-cookie btn-disabled">
         <span class="icon icon-copy"></span>
       </div>
+      <div class="btn copy-all-cookie" title="Copy All">
+        <span class="icon icon-copy"></span>All
+      </div>
       <div class="btn delete-cookie btn-disabled">
         <span class="icon icon-delete"></span>
       </div>
@@ -154,6 +157,12 @@ export default class Cookie {
       .on('click', c('.copy-cookie'), () => {
         const key = this._selectedItem
         copy(this._getVal(key))
+        devtools.notify('Copied', { icon: 'success' })
+      })
+      .on('click', c('.copy-all-cookie'), () => {
+        const { cookies } = chobitsu.domain('Network').getCookies()
+        const lines = map(cookies, ({ name, value }) => `${name} = ${value}`)
+        copy(lines.join('\n'))
         devtools.notify('Copied', { icon: 'success' })
       })
       .on('click', c('.filter'), () => {

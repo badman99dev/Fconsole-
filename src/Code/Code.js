@@ -90,7 +90,7 @@ export default class Code extends Tool {
       if (script.src) {
         files.push({
           type: 'JS',
-          name: this._basename(script.src, `script-${i}.js`),
+          name: this._pathOrUrl(script.src),
           url: script.src,
           inline: false,
         })
@@ -105,13 +105,13 @@ export default class Code extends Tool {
     })
 
     let inlineStyleCount = 0
-    each(document.styleSheets, (sheet, i) => {
+    each(document.styleSheets, (sheet) => {
       const href = sheet.href
 
       if (href) {
         files.push({
           type: 'CSS',
-          name: this._basename(href, `style-${i}.css`),
+          name: this._pathOrUrl(href),
           url: href,
           inline: false,
         })
@@ -144,6 +144,17 @@ export default class Code extends Tool {
       return name || fallback
     } catch {
       return fallback
+    }
+  }
+  _pathOrUrl(url) {
+    try {
+      const u = new URL(url, location.href)
+      if (u.origin === location.origin) {
+        return u.pathname + u.search
+      }
+      return u.href
+    } catch {
+      return url
     }
   }
   _updateButtons() {
@@ -230,13 +241,13 @@ export default class Code extends Tool {
     }
 
     if (file.inline) {
-      this._triggerDownload(file.content, file.name)
+      this._triggerDownload(file.content, file.name.replace(/^\//, ''))
       return
     }
 
     ajax({
       url: file.url,
-      success: (data) => this._triggerDownload(data, file.name),
+      success: (data) => this._triggerDownload(data, this._basename(file.url, file.name)),
       error: () =>
         this._container.notify('Failed to fetch file', { icon: 'error' }),
       dataType: 'raw',

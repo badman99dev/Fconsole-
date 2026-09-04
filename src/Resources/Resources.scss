@@ -5,6 +5,19 @@
   @include overflow-auto(y);
   padding: 10px;
   font-size: 14px;
+  .copy-all-storage,
+  .copy-all-cookie,
+  .download-all-btn {
+    width: auto !important;
+    font-size: $font-size-s;
+    padding: 0 4px;
+    .icon {
+      position: static !important;
+      padding: 0 !important;
+      font-size: $font-size-s !important;
+      vertical-align: middle;
+    }
+  }
   .section {
     margin-bottom: 10px;
     overflow: hidden;

@@ -121,6 +121,9 @@ export default class Storage {
       <div class="btn copy-storage btn-disabled">
         <span class="icon icon-copy"></span>
       </div>
+      <div class="btn copy-all-storage" title="Copy All">
+        <span class="icon icon-copy"></span>All
+      </div>
       <div class="btn delete-storage btn-disabled">
         <span class="icon icon-delete"></span>
       </div>
@@ -181,6 +184,24 @@ export default class Storage {
       .on('click', c('.copy-storage'), () => {
         const key = this._selectedItem
         copy(this._getVal(key))
+        devtools.notify('Copied', { icon: 'success' })
+      })
+      .on('click', c('.copy-all-storage'), () => {
+        let store = safeStorage(type, false)
+        if (!store) return
+
+        store = JSON.parse(JSON.stringify(store))
+
+        const lines = []
+        each(store, (val, key) => {
+          if (!isStr(val)) return
+          if (this._resources.config.get('hideErudaSetting')) {
+            if (startWith(key, 'eruda') || key === 'active-eruda') return
+          }
+          lines.push(`${key} = ${val}`)
+        })
+
+        copy(lines.join('\n'))
         devtools.notify('Copied', { icon: 'success' })
       })
       .on('click', c('.filter'), () => {

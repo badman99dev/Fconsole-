@@ -12,11 +12,14 @@ import MutationObserver from 'licia/MutationObserver'
 import toArr from 'licia/toArr'
 import concat from 'licia/concat'
 import map from 'licia/map'
-import { isErudaEl, classPrefix as c } from '../lib/util'
+import { isErudaEl, classPrefix as c, safeStorage } from '../lib/util'
 import evalCss from '../lib/evalCss'
 import Storage from './Storage'
 import Cookie from './Cookie'
 import { setState, getState } from './util'
+import chobitsu from '../lib/chobitsu'
+import isStr from 'licia/isStr'
+import startWith from 'licia/startWith'
 
 export default class Resources extends Tool {
   constructor() {
@@ -196,6 +199,59 @@ export default class Resources extends Tool {
 
     return this
   }
+  _downloadAllResources = () => {
+    const lines = []
+
+    const addSection = (title, type) => {
+      lines.push(`// ${title}`)
+
+      let store = safeStorage(type, false)
+      let hasData = false
+
+      if (store) {
+        store = JSON.parse(JSON.stringify(store))
+        each(store, (val, key) => {
+          if (!isStr(val)) return
+          if (this._hideErudaSetting) {
+            if (startWith(key, 'eruda') || key === 'active-eruda') return
+          }
+          lines.push(`${key} = ${val}`)
+          hasData = true
+        })
+      }
+
+      if (!hasData) lines.push('(empty)')
+      lines.push('')
+    }
+
+    lines.push('// Cookies')
+    const { cookies } = chobitsu.domain('Network').getCookies()
+    if (isEmpty(cookies)) {
+      lines.push('(empty)')
+    } else {
+      each(cookies, ({ name, value }) => {
+        lines.push(`${name} = ${value}`)
+      })
+    }
+    lines.push('')
+
+    addSection('Local Storage', 'local')
+    addSection('Session Storage', 'session')
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'resources.txt'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+    this._container.notify('Downloaded', { icon: 'success' })
+  }
   refreshImage() {
     let imageData = []
 
@@ -274,7 +330,15 @@ export default class Resources extends Tool {
       <div class="section script"></div>
       <div class="section stylesheet"></div>
       <div class="section iframe"></div>
-      <div class="section image"></div>`)
+      <div class="section image"></div>
+      <div class="section download-all">
+        <h2 class="title">
+          Download All Resources
+          <div class="btn download-all-btn" title="Download">
+            <span class="icon icon-copy"></span>Download
+          </div>
+        </h2>
+      </div>`)
     )
     this._$localStorage = $el.find(c('.local-storage'))
     this._$sessionStorage = $el.find(c('.session-storage'))
@@ -313,6 +377,7 @@ export default class Resources extends Tool {
       .on('click', '.eruda-css-link', linkFactory('css'))
       .on('click', '.eruda-js-link', linkFactory('js'))
       .on('click', '.eruda-iframe-link', linkFactory('iframe'))
+      .on('click', '.eruda-download-all-btn', this._downloadAllResources)
 
     function showSources(type, data) {
       const sources = container.get('sources')
