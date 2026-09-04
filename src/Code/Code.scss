@@ -1,0 +1,45 @@
+@use '../style/variable' as *;
+@use '../style/mixin' as *;
+
+#code {
+  @include absolute();
+  @include overflow-auto(y);
+  color: var(--foreground);
+  font-size: $font-size-s;
+
+  .title {
+    padding: $padding;
+    line-height: 24px;
+    color: var(--primary);
+    background: var(--darker-background);
+    border-bottom: 1px solid var(--border);
+    font-size: $font-size;
+    overflow: hidden;
+  }
+  .btn {
+    float: right;
+    margin-left: 8px;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: $font-size-s;
+    line-height: 16px;
+    cursor: pointer;
+    color: var(--primary);
+    .icon {
+      font-size: 12px;
+      margin-right: 2px;
+    }
+    &:active {
+      background: var(--highlight);
+    }
+    &.btn-disabled {
+      color: var(--border) !important;
+      cursor: default !important;
+      pointer-events: none;
+    }
+  }
+  .data-grid {
+    padding: $padding;
+  }
+}

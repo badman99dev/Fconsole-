@@ -8,6 +8,7 @@ import Snippets from './Snippets/Snippets'
 import Resources from './Resources/Resources'
 import Info from './Info/Info'
 import Sources from './Sources/Sources'
+import Code from './Code/Code'
 import Settings from './Settings/Settings'
 import emitter from './lib/emitter'
 import logger from './lib/logger'
@@ -93,6 +94,7 @@ export default {
   Elements,
   Network,
   Sources,
+  Code,
   Resources,
   Info,
   Snippets,
@@ -294,6 +296,7 @@ export default {
       'network',
       'resources',
       'sources',
+      'code',
       'info',
       'snippets',
     ]
