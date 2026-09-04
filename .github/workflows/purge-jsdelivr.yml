@@ -1,0 +1,16 @@
+name: Purge jsdelivr Cache
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge jsdelivr CDN cache
+        run: |
+          curl -s "https://purge.jsdelivr.net/gh/${{ github.repository }}@master/dist/eruda.js"
+          echo ""
+          echo "Purge request sent for dist/eruda.js"
