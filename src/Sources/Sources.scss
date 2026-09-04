@@ -5,6 +5,31 @@
   font-size: 0;
   @include overflow-auto(y);
   color: var(--foreground);
+  padding-top: 40px;
+  .control {
+    @include control();
+    padding: 0 10px;
+    line-height: 40px;
+  }
+  .btn {
+    display: inline-block;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    padding: 4px 10px;
+    font-size: $font-size-s;
+    line-height: 20px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--primary);
+    cursor: pointer;
+    &:active {
+      background: var(--highlight);
+    }
+  }
+  .content {
+    height: 100%;
+  }
   .code-wrapper,
   .raw-wrapper {
     @include overflow-auto(x);

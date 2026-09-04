@@ -131,7 +131,6 @@ export default class Elements extends Tool {
           <span class="icon icon-select select"></span>
           <span class="icon icon-eye show-detail"></span>
           <span class="icon icon-copy copy-node"></span>
-          <span class="icon icon-copy download-page" title="Download Page Source"></span>
           <span class="icon icon-delete delete-node"></span>
         </div>
         <div class="dom-viewer-container">
@@ -189,7 +188,6 @@ export default class Elements extends Tool {
       .on('click', c('.select'), this._toggleSelect)
       .on('click', c('.show-detail'), this._showDetail)
       .on('click', c('.copy-node'), this._copyNode)
-      .on('click', c('.download-page'), this._downloadPage)
       .on('click', c('.delete-node'), this._deleteNode)
 
     this._domViewer.on('select', this._setNode).on('deselect', this._back)
@@ -229,22 +227,6 @@ export default class Elements extends Tool {
     }
 
     this._container.notify('Copied', { icon: 'success' })
-  }
-  _downloadPage = () => {
-    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML
-    const blob = new Blob([html], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-
-    const a = document.createElement('a')
-    a.href = url
-    a.download = (document.title || 'page') + '.html'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
-
-    this._container.notify('Downloaded', { icon: 'success' })
   }
   _toggleSelect = () => {
     this._$el.find(c('.select')).toggleClass(c('active'))

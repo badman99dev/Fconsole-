@@ -25,8 +25,18 @@ export default class Sources extends Tool {
     super.init($el)
 
     this._container = container
+    this._initTpl()
     this._bindEvent()
     this._initCfg()
+  }
+  _initTpl() {
+    this._$el.html(
+      c(`<div class="control">
+        <div class="btn download-html">Download HTML</div>
+      </div>
+      <div class="content"></div>`)
+    )
+    this._$content = this._$el.find(c('.content'))
   }
   destroy() {
     super.destroy()
@@ -109,6 +119,25 @@ export default class Sources extends Tool {
         delete this._data
       }
     })
+
+    this._$el.on('click', c('.download-html'), this._downloadHtml)
+  }
+  _downloadHtml = () => {
+    const html =
+      this._html || '<!DOCTYPE html>\n' + document.documentElement.outerHTML
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = (document.title || 'page') + '.html'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+    this._container.notify('Downloaded', { icon: 'success' })
   }
   _rmCfg() {
     const cfg = this.config
@@ -259,7 +288,7 @@ export default class Sources extends Tool {
   _renderHtml(html, cache = true) {
     if (cache && html === this._lastHtml) return
     this._lastHtml = html
-    this._$el.html(html)
+    this._$content.html(html)
     // Need setTimeout to make it work
     setTimeout(() => (this._$el.get(0).scrollTop = 0), 0)
   }
